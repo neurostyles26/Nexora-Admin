@@ -70,7 +70,7 @@ const handleLogout = async () => {
                   <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg border border-white/10 group-hover:rotate-3 transition-all duration-500 shrink-0">
                      <Sparkles class="w-5 h-5 text-white" />
                   </div>
-                  <span class="text-xl font-black italic tracking-tighter uppercase truncate" style="color: var(--text-primary);">Nexora</span>
+                  <span class="text-xl font-black italic tracking-tighter uppercase truncate sidebar-logo-text">Nexora</span>
                </div>
                
                <!-- Toggle -->
@@ -128,11 +128,11 @@ const handleLogout = async () => {
              ]"
              style="background: rgba(255,255,255,0.04);"
            >
-              <component :is="item.icon" class="w-[18px] h-[18px] opacity-70 group-hover:opacity-100 transition-all" />
+              <component :is="item.icon" class="w-[18px] h-[18px] transition-all nav-icon" />
            </div>
            
            <transition name="fade">
-             <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] opacity-80 group-hover:opacity-100 transition-all truncate" style="color: var(--text-secondary);">
+             <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] transition-all truncate nav-text">
                {{ item.name }}
              </span>
            </transition>
@@ -168,7 +168,7 @@ const handleLogout = async () => {
       >
         <Settings class="w-[18px] h-[18px] group-hover:rotate-45 transition-transform shrink-0" style="color: var(--text-muted);" />
         <transition name="fade">
-          <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[10px] uppercase tracking-widest group-hover:text-[var(--text-primary)] transition-colors truncate" style="color: var(--text-muted);">Preferencias</span>
+          <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[10px] uppercase tracking-widest group-hover:text-[var(--text-primary)] transition-colors truncate nav-text-muted">Preferencias</span>
         </transition>
       </router-link>
       
