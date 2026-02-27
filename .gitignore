@@ -1,3 +1,15 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Environment variables (Supabase keys, secrets)
+.env
+.env.*
+!.env.example
+
 # Logs
 logs
 *.log
@@ -7,19 +19,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Local config
 *.local
-.env
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# PWA generated files (dev)
+dev-dist
+sw.js
+workbox-*.js
