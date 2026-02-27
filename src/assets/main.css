@@ -58,19 +58,19 @@
         radial-gradient(at 50% 0%, hsla(220, 38%, 90%, 0.4) 0, transparent 50%),
         radial-gradient(at 100% 0%, hsla(220, 38%, 85%, 0.2) 0, transparent 50%);
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    --text-primary: #020617;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
 
     --accent-primary: #4f46e5;
     --accent-secondary: #9333ea;
-    --accent-glow: rgba(79, 70, 229, 0.2);
+    --accent-glow: rgba(79, 70, 229, 0.15);
 
-    --border-primary: rgba(0, 0, 0, 0.08);
-    --border-secondary: rgba(0, 0, 0, 0.04);
+    --border-primary: rgba(15, 23, 42, 0.12);
+    --border-secondary: rgba(15, 23, 42, 0.06);
 
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(15, 23, 42, 0.08);
     --glass-blur: 15px;
 
     color-scheme: light;
@@ -139,12 +139,19 @@
 /* ═══════════════════════════════════════════
    TYPOGRAPHY
    ═══════════════════════════════════════════ */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     letter-spacing: -0.025em;
     color: var(--text-primary) !important;
 }
 
-p, span, div {
+p,
+span,
+div {
     transition: color 0.5s ease;
 }
 
@@ -288,28 +295,28 @@ p, span, div {
 .badge-success {
     @apply badge;
     background: rgba(16, 185, 129, 0.1);
-    color: #34d399;
+    color: #059669;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .badge-danger {
     @apply badge;
     background: rgba(244, 63, 94, 0.1);
-    color: #fb7185;
+    color: #e11d48;
     border: 1px solid rgba(244, 63, 94, 0.2);
 }
 
 .badge-warning {
     @apply badge;
     background: rgba(245, 158, 11, 0.1);
-    color: #fbbf24;
+    color: #d97706;
     border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .badge-info {
     @apply badge;
     background: rgba(99, 102, 241, 0.1);
-    color: #818cf8;
+    color: #4f46e5;
     border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
@@ -392,18 +399,37 @@ p, span, div {
    ANIMATIONS
    ═══════════════════════════════════════════ */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideUp {
-    from { transform: translateY(40px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes spinSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .animate-fade-in {
@@ -424,6 +450,7 @@ p, span, div {
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -433,13 +460,16 @@ p, span, div {
     width: 6px;
     height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(99, 102, 241, 0.2);
 }

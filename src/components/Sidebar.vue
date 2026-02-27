@@ -132,7 +132,7 @@ const handleLogout = async () => {
            </div>
            
            <transition name="fade">
-             <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] opacity-70 group-hover:opacity-100 transition-opacity truncate">
+             <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] opacity-80 group-hover:opacity-100 transition-all truncate" style="color: var(--text-secondary);">
                {{ item.name }}
              </span>
            </transition>
@@ -168,7 +168,7 @@ const handleLogout = async () => {
       >
         <Settings class="w-[18px] h-[18px] group-hover:rotate-45 transition-transform shrink-0" style="color: var(--text-muted);" />
         <transition name="fade">
-          <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[10px] uppercase tracking-widest group-hover:text-[var(--text-primary)] truncate" style="color: var(--text-muted);">Preferencias</span>
+          <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[10px] uppercase tracking-widest group-hover:text-[var(--text-primary)] transition-colors truncate" style="color: var(--text-muted);">Preferencias</span>
         </transition>
       </router-link>
       

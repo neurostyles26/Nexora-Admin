@@ -100,7 +100,7 @@ onMounted(() => {
       <div class="flex items-center gap-3 pl-3 lg:pl-6 border-l" style="border-color: var(--border-primary);">
         <div class="text-right hidden lg:block space-y-0.5 max-w-[120px]">
           <p class="text-[10px] font-black italic tracking-tight uppercase truncate" style="color: var(--text-primary);">{{ authStore.user?.email?.split('@')[0] }}</p>
-          <p class="text-[8px] font-bold uppercase tracking-[0.2em] opacity-60" style="color: var(--text-muted);">Admin</p>
+          <p class="text-[8px] font-bold uppercase tracking-[0.2em] opacity-80" style="color: var(--text-muted);">Admin</p>
         </div>
         <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border border-white/10 shadow-lg group cursor-pointer hover:scale-105 transition-all duration-300 shrink-0">
           <User class="w-4 h-4 lg:w-5 lg:h-5 text-white" />
