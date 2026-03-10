@@ -37,8 +37,8 @@ export const useAuthStore = defineStore('auth', {
             if (error) throw error
 
             const { data: profile } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', data.user.id).single()
-            if (profile && !profile.is_verified) {
-                // If not verified, but session is created, we sign out
+            if (profile && !profile.is_verified && !profile.is_system_admin) {
+                // If not verified and NOT a system admin, we sign out
                 await supabase.auth.signOut()
                 throw new Error('Tu cuenta está pendiente de verificación por un administrador.')
             }
