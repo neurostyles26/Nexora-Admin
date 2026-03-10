@@ -183,10 +183,50 @@ RETURNS UUID AS $$
     SELECT business_id FROM business_users WHERE user_id = auth.uid() LIMIT 1;
 $$ LANGUAGE SQL STABLE SECURITY DEFINER;
 
--- RLS Policies Example (Customers)
+-- RLS Policies
+
+-- Users Policy: Everyone can see their own profile, System Admins can see everything
+DROP POLICY IF EXISTS "Users can view their own profile" ON users;
+CREATE POLICY "Users can view their own profile" ON users
+    FOR SELECT USING (auth.uid() = id OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+DROP POLICY IF EXISTS "System admins can manage all users" ON users;
+CREATE POLICY "System admins can manage all users" ON users
+    FOR ALL USING ((SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Business Users: Users can see their own business assignments
+DROP POLICY IF EXISTS "Users can see their business assignments" ON business_users;
+CREATE POLICY "Users can see their business assignments" ON business_users
+    FOR SELECT USING (user_id = auth.uid() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Customers Policy
 DROP POLICY IF EXISTS "Users can only see customers of their business" ON customers;
 CREATE POLICY "Users can only see customers of their business" ON customers
-    FOR ALL USING (business_id = get_user_business_id());
+    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Products Policy
+DROP POLICY IF EXISTS "Users can only see products of their business" ON products;
+CREATE POLICY "Users can only see products of their business" ON products
+    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Orders Policy
+DROP POLICY IF EXISTS "Users can only see orders of their business" ON orders;
+CREATE POLICY "Users can only see orders of their business" ON orders
+    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Notifications Policy
+DROP POLICY IF EXISTS "Users can see their business notifications" ON notifications;
+CREATE POLICY "Users can see their business notifications" ON notifications
+    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+-- Promotions: Everyone can see active, System Admins can manage
+DROP POLICY IF EXISTS "Everyone can see active promotions" ON promotions;
+CREATE POLICY "Everyone can see active promotions" ON promotions
+    FOR SELECT USING (status = 'active' OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+
+DROP POLICY IF EXISTS "System admins can manage promotions" ON promotions;
+CREATE POLICY "System admins can manage promotions" ON promotions
+    FOR ALL USING ((SELECT is_system_admin FROM users WHERE id = auth.uid()));
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_customers_business ON customers(business_id);
