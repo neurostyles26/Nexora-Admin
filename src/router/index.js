@@ -28,6 +28,11 @@ const routes = [
             { path: 'products', name: 'Products', component: () => import('../views/Products.vue') },
             { path: 'orders', name: 'Orders', component: () => import('../views/Orders.vue') },
             { path: 'settings', name: 'Settings', component: () => import('../views/Settings.vue') },
+            // Global Admin Routes
+            { path: 'admin/users', name: 'AdminUsers', component: () => import('../views/AdminUsers.vue') },
+            { path: 'admin/promotions', name: 'Promotions', component: () => import('../views/Promotions.vue') },
+            { path: 'admin/logs', name: 'AdminLogs', component: () => import('../views/Dashboard.vue') }, // Placeholder
+            { path: 'admin/databases', name: 'AdminDatabases', component: () => import('../views/Integrations.vue') }, // Reusing integrations for now
         ]
     },
 ]

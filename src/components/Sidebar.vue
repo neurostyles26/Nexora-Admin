@@ -9,8 +9,11 @@ import {
   LogOut,
   ChevronRight,
   Sparkles,
-  PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  Shield,
+  TicketPercent,
+  History,
+  Database
 } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
 import { useLayoutStore } from '../stores/layout'
@@ -24,6 +27,13 @@ const menuItems = [
   { name: 'Catálogo', icon: Package, path: '/dashboard/products' },
   { name: 'Transacciones', icon: ShoppingCart, path: '/dashboard/orders' },
   { name: 'Ecosistema', icon: BarChart2, path: '/dashboard/integrations' },
+]
+
+const adminItems = [
+  { name: 'Usuarios Global', icon: Shield, path: '/dashboard/admin/users' },
+  { name: 'Promociones', icon: TicketPercent, path: '/dashboard/admin/promotions' },
+  { name: 'Historial', icon: History, path: '/dashboard/admin/logs' },
+  { name: 'Bases de Datos', icon: Database, path: '/dashboard/admin/databases' },
 ]
 
 const handleLogout = async () => {
@@ -108,7 +118,11 @@ const handleLogout = async () => {
     </div>
     
     <!-- Navigation -->
-    <nav class="flex-1 px-3 space-y-1.5 overflow-y-auto scrollbar-hide">
+    <nav class="flex-1 px-3 space-y-1.5 overflow-y-auto scrollbar-hide py-2">
+      <div v-if="!layoutStore.isSidebarCollapsed" class="px-4 py-3 mb-2">
+        <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em]">Principal</p>
+      </div>
+
       <router-link 
         v-for="item in menuItems" 
         :key="item.name"
@@ -122,32 +136,52 @@ const handleLogout = async () => {
       >
         <div class="flex items-center gap-4 min-w-0">
            <div 
-             :class="[
-               'w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0',
-               layoutStore.isSidebarCollapsed ? '' : ''
-             ]"
+             class="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0"
              style="background: rgba(255,255,255,0.04);"
            >
               <component :is="item.icon" class="w-[18px] h-[18px] transition-all nav-icon" />
            </div>
-           
            <transition name="fade">
              <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] transition-all truncate nav-text">
                {{ item.name }}
              </span>
            </transition>
         </div>
-        
-        <ChevronRight 
-          v-if="!layoutStore.isSidebarCollapsed"
-          class="w-3.5 h-3.5 opacity-0 group-hover:opacity-30 transition-all -translate-x-1 group-hover:translate-x-0 shrink-0" 
-        />
-
-        <!-- Tooltip for collapsed mode -->
-        <div v-if="layoutStore.isSidebarCollapsed" class="absolute left-full ml-3 px-3 py-1.5 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-x-[-8px] group-hover:translate-x-0 shadow-xl z-[100] whitespace-nowrap" style="color: var(--text-primary);">
-           {{ item.name }}
-        </div>
+        <ChevronRight v-if="!layoutStore.isSidebarCollapsed" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-30 transition-all -translate-x-1 group-hover:translate-x-0" />
       </router-link>
+
+      <!-- Global Admin Section -->
+      <div v-if="authStore.user?.is_system_admin" class="pt-6 space-y-1.5">
+        <div v-if="!layoutStore.isSidebarCollapsed" class="px-4 py-3 mb-2">
+          <p class="text-[9px] font-black text-indigo-400 uppercase tracking-[0.4em]">Gestión Global</p>
+        </div>
+        
+        <router-link 
+          v-for="item in adminItems" 
+          :key="item.name"
+          :to="item.path"
+          @click="layoutStore.closeMobileMenu"
+          :class="[
+            'flex items-center rounded-2xl transition-all duration-300 group border border-transparent hover:border-indigo-500/20 active:scale-[0.98] relative',
+            layoutStore.isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-4 py-3.5'
+          ]"
+          active-class="nav-active-admin"
+        >
+          <div class="flex items-center gap-4 min-w-0">
+             <div 
+               class="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 bg-indigo-500/5"
+             >
+                <component :is="item.icon" class="w-[18px] h-[18px] transition-all text-indigo-400 group-hover:text-indigo-300" />
+             </div>
+             <transition name="fade">
+               <span v-if="!layoutStore.isSidebarCollapsed" class="font-bold text-[11px] uppercase tracking-[0.15em] transition-all truncate text-slate-400 group-hover:text-indigo-100">
+                 {{ item.name }}
+               </span>
+             </transition>
+          </div>
+          <ChevronRight v-if="!layoutStore.isSidebarCollapsed" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-30 transition-all -translate-x-1 group-hover:translate-x-0 text-indigo-400" />
+        </router-link>
+      </div>
     </nav>
 
     <!-- Bottom Actions -->
@@ -210,8 +244,25 @@ const handleLogout = async () => {
 }
 
 .nav-active svg {
-  color: white !important;
   opacity: 1 !important;
+}
+
+.nav-active-admin {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), transparent);
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+.nav-active-admin span {
+  color: white !important;
+}
+
+.nav-active-admin div {
+  background: var(--accent-primary) !important;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.nav-active-admin svg {
+  color: white !important;
 }
 
 .fade-enter-active,

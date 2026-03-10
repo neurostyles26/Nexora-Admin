@@ -19,8 +19,12 @@ export const useAuthStore = defineStore('auth', {
             supabase.auth.onAuthStateChange(async (_event, session) => {
                 this.session = session
                 if (session?.user) {
-                    const { data } = await supabase.from('users').select('is_verified').eq('id', session.user.id).single()
-                    this.user = { ...session.user, is_verified: data?.is_verified }
+                    const { data } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', session.user.id).single()
+                    this.user = {
+                        ...session.user,
+                        is_verified: data?.is_verified,
+                        is_system_admin: data?.is_system_admin
+                    }
                 } else {
                     this.user = null
                 }
@@ -31,15 +35,19 @@ export const useAuthStore = defineStore('auth', {
             const { data, error } = await supabase.auth.signInWithPassword({ email, password })
             this.loading = false
             if (error) throw error
-            
-            const { data: profile } = await supabase.from('users').select('is_verified').eq('id', data.user.id).single()
+
+            const { data: profile } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', data.user.id).single()
             if (profile && !profile.is_verified) {
                 // If not verified, but session is created, we sign out
                 await supabase.auth.signOut()
                 throw new Error('Tu cuenta está pendiente de verificación por un administrador.')
             }
 
-            this.user = { ...data.user, is_verified: profile?.is_verified }
+            this.user = {
+                ...data.user,
+                is_verified: profile?.is_verified,
+                is_system_admin: profile?.is_system_admin
+            }
             this.session = data.session
 
             if (rememberMe) {

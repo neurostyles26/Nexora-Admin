@@ -22,15 +22,19 @@ CREATE TABLE IF NOT EXISTS users (
     full_name TEXT,
     avatar_url TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
+    is_system_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Ensure is_verified exists if the table was created previously without it
+-- Ensure columns exist
 DO $$ 
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_verified') THEN
         ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_system_admin') THEN
+        ALTER TABLE users ADD COLUMN is_system_admin BOOLEAN DEFAULT FALSE;
     END IF;
 END $$;
 
@@ -144,6 +148,18 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 11. Promotions & Plans
+CREATE TABLE IF NOT EXISTS promotions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
+    description TEXT,
+    discount_percent DECIMAL(5,2),
+    plan_tier TEXT, -- 'basic', 'premium', 'enterprise'
+    status TEXT DEFAULT 'active',
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Enable RLS
 ALTER TABLE businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -198,8 +214,14 @@ CREATE TRIGGER on_user_signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.users (id, full_name, avatar_url, is_verified)
-    VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'avatar_url', FALSE);
+    INSERT INTO public.users (id, full_name, avatar_url, is_verified, is_system_admin)
+    VALUES (
+        NEW.id, 
+        NEW.raw_user_meta_data->>'full_name', 
+        NEW.raw_user_meta_data->>'avatar_url', 
+        FALSE,
+        COALESCE((NEW.raw_user_meta_data->>'is_system_admin')::boolean, FALSE)
+    );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

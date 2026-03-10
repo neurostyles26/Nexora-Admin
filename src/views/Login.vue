@@ -12,6 +12,7 @@ const password = ref('')
 const errorMsg = ref('')
 const loading = ref(false)
 const showPassword = ref(false)
+const loginRole = ref('user') // 'admin' or 'user'
 
 const rememberMe = ref(false)
 
@@ -20,6 +21,12 @@ const handleLogin = async () => {
     loading.value = true
     errorMsg.value = ''
     await authStore.signIn(email.value, password.value, rememberMe.value)
+    
+    if (loginRole.value === 'admin' && !authStore.user.is_system_admin) {
+      await authStore.signOut()
+      throw new Error('No tienes permisos de Administrador Global.')
+    }
+    
     router.push('/dashboard')
   } catch (err) {
     errorMsg.value = 'Credenciales inválidas o error de conexión.'
@@ -49,8 +56,31 @@ const handleLogin = async () => {
         </div>
         
         <div class="text-center mb-8">
-          <h2 class="text-2xl font-black tracking-tight italic" style="color: var(--text-primary);">Acceso Seguro</h2>
-          <p class="text-sm mt-2 font-medium italic" style="color: var(--text-secondary);">Gestiona tu núcleo inteligente</p>
+          <h2 class="text-2xl font-black tracking-tight italic uppercase" style="color: var(--text-primary);">
+            {{ loginRole === 'admin' ? 'Nexora Central' : 'Acceso Seguro' }}
+          </h2>
+          <p class="text-sm mt-2 font-medium italic" style="color: var(--text-secondary);">
+            {{ loginRole === 'admin' ? 'Portal de Gestión Global' : 'Gestiona tu núcleo inteligente' }}
+          </p>
+        </div>
+
+        <div class="flex p-1.5 bg-white/5 border border-[var(--border-primary)] rounded-2xl mb-8">
+          <button 
+            type="button"
+            @click="loginRole = 'user'"
+            class="flex-1 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all"
+            :class="loginRole === 'user' ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'"
+          >
+            Usuario
+          </button>
+          <button 
+            type="button"
+            @click="loginRole = 'admin'"
+            class="flex-1 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all"
+            :class="loginRole === 'admin' ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'"
+          >
+            Administrador
+          </button>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-5">
