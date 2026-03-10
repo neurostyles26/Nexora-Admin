@@ -164,7 +164,7 @@ const closeEditor = () => {
               <div class="space-y-4">
                 <div v-for="(step, i) in [
                   { t: 'Obtener Datos', d: 'En Power BI Desktop, selecciona \'Obtener datos\' > \'Base de datos PostgreSQL\'.' },
-                  { t: 'Configurar Servidor', d: 'Ingresa el Host (db.czcrcamukofdsyjdkact.supabase.co) y la base de datos (postgres).' },
+                  { t: 'Configurar Servidor', d: 'Ingresa el Host (db.nmbspoggnqhwopmcpvvd.supabase.co) y la base de datos (postgres).' },
                   { t: 'Credenciales', d: 'Selecciona \'Base de datos\' en el panel izquierdo e ingresa el usuario (postgres) y tu Secret Password.' },
                   { t: 'Modo DirectQuery', d: 'Elige \'DirectQuery\' para ver los datos en tiempo real sin necesidad de actualizar manualmente.' }
                 ]" :key="i" class="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-yellow-500/20 transition-all">
@@ -381,7 +381,7 @@ const closeEditor = () => {
 
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div v-for="info in [
-                          { label: 'Host', value: 'db.czcrcamukofdsyjdkact.supabase.co' },
+                          { label: 'Host', value: 'db.nmbspoggnqhwopmcpvvd.supabase.co' },
                           { label: 'Puerto', value: '5432' },
                           { label: 'Base de Datos', value: 'postgres' },
                           { label: 'Usuario', value: 'postgres' }
