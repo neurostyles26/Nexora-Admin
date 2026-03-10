@@ -5,7 +5,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. Businesses (Tenants)
-CREATE TABLE businesses (
+CREATE TABLE IF NOT EXISTS businesses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE businesses (
 );
 
 -- 2. Users Profile (Extends Auth.Users)
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT,
     avatar_url TEXT,
@@ -26,8 +26,16 @@ CREATE TABLE users (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure is_verified exists if the table was created previously without it
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_verified') THEN
+        ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
 -- 3. Business Users (RBAC & Multi-tenancy)
-CREATE TABLE business_users (
+CREATE TABLE IF NOT EXISTS business_users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -37,7 +45,7 @@ CREATE TABLE business_users (
 );
 
 -- 4. Customers
-CREATE TABLE customers (
+CREATE TABLE IF NOT EXISTS customers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     first_name TEXT NOT NULL,
@@ -51,7 +59,7 @@ CREATE TABLE customers (
 );
 
 -- 5. Products & Services
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     sku TEXT,
@@ -67,7 +75,7 @@ CREATE TABLE products (
 );
 
 -- 6. Orders
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     customer_id UUID REFERENCES customers(id),
@@ -80,7 +88,7 @@ CREATE TABLE orders (
 );
 
 -- 7. Order Items
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id),
@@ -91,7 +99,7 @@ CREATE TABLE order_items (
 );
 
 -- 8. Inventory Movements
-CREATE TABLE inventory_movements (
+CREATE TABLE IF NOT EXISTS inventory_movements (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id),
@@ -102,7 +110,7 @@ CREATE TABLE inventory_movements (
 );
 
 -- 9. Integrations (Google Sheets)
-CREATE TABLE sheet_connections (
+CREATE TABLE IF NOT EXISTS sheet_connections (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     spreadsheet_id TEXT NOT NULL,
@@ -115,7 +123,7 @@ CREATE TABLE sheet_connections (
 );
 
 -- 10. Activity Logs & Notifications
-CREATE TABLE activity_logs (
+CREATE TABLE IF NOT EXISTS activity_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id),
@@ -126,7 +134,7 @@ CREATE TABLE activity_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id),
@@ -180,6 +188,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_user_signup ON users;
 CREATE TRIGGER on_user_signup
     AFTER INSERT ON users
     FOR EACH ROW
@@ -195,6 +204,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
