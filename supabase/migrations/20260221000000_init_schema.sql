@@ -168,11 +168,11 @@ CREATE POLICY "Users can only see customers of their business" ON customers
     FOR ALL USING (business_id = get_user_business_id());
 
 -- Indexes for performance
-CREATE INDEX idx_customers_business ON customers(business_id);
-CREATE INDEX idx_products_business ON products(business_id);
-CREATE INDEX idx_orders_business ON orders(business_id);
-CREATE INDEX idx_order_items_order ON order_items(order_id);
-CREATE INDEX idx_inventory_movements_product ON inventory_movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_customers_business ON customers(business_id);
+CREATE INDEX IF NOT EXISTS idx_products_business ON products(business_id);
+CREATE INDEX IF NOT EXISTS idx_orders_business ON orders(business_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_movements_product ON inventory_movements(product_id);
 
 -- 11. Automated Triggers
 -- Notify Super Admin of new registrations
