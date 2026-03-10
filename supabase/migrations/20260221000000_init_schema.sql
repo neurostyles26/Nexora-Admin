@@ -21,6 +21,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT,
     avatar_url TEXT,
+    is_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -164,3 +165,36 @@ CREATE INDEX idx_products_business ON products(business_id);
 CREATE INDEX idx_orders_business ON orders(business_id);
 CREATE INDEX idx_order_items_order ON order_items(order_id);
 CREATE INDEX idx_inventory_movements_product ON inventory_movements(product_id);
+
+-- 11. Automated Triggers
+-- Notify Super Admin of new registrations
+CREATE OR REPLACE FUNCTION notify_new_registration()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO notifications (business_id, title, message)
+    SELECT id, 'Nuevo Administrador Pendiente', 'El usuario ' || NEW.full_name || ' se ha registrado y espera verificación.'
+    FROM businesses 
+    WHERE slug = 'nexora-global' -- Assuming the main business slug
+    LIMIT 1;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_user_signup
+    AFTER INSERT ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION notify_new_registration();
+
+-- Sync Supabase Auth with public.users
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.users (id, full_name, avatar_url, is_verified)
+    VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'avatar_url', FALSE);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();

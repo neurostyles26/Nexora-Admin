@@ -13,6 +13,11 @@ const routes = [
         component: () => import('../views/Login.vue'),
     },
     {
+        path: '/register',
+        name: 'Register',
+        component: () => import('../views/Register.vue'),
+    },
+    {
         path: '/dashboard',
         component: () => import('../layouts/DashboardLayout.vue'),
         meta: { requiresAuth: true },

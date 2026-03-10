@@ -122,8 +122,11 @@ const handleLogin = async () => {
         </form>
 
         <div class="mt-8 pt-6 border-t border-[var(--border-primary)] flex flex-col items-center gap-4">
-          <p class="text-[10px] font-bold uppercase tracking-[0.2em] cursor-pointer hover:text-indigo-400 transition-colors" style="color: var(--text-muted);">
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em]" style="color: var(--text-muted);">
             ¿Olvidaste tu contraseña?
+          </p>
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em]" style="color: var(--text-muted);">
+            ¿No tienes cuenta? <router-link to="/register" class="text-indigo-400 hover:text-indigo-300 ml-1">Regístrate</router-link>
           </p>
           <div class="flex items-center gap-2">
              <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_6px_var(--accent-glow)]"></div>

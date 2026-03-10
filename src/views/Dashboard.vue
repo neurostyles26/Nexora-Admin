@@ -13,11 +13,17 @@ import {
   BookOpen,
   ArrowRight,
   X,
-  Info
+  Info,
+  UserPlus,
+  Check,
+  ShieldAlert
 } from 'lucide-vue-next'
+import { supabase } from '../services/supabase'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const showWelcomePopup = ref(false)
+const pendingUsers = ref([])
 
 const stats = [
   { name: 'Ventas Totales', value: '$12,845', trend: '+12.5%', icon: ShoppingBag, color: 'text-emerald-400', detail: 'Mes Actual' },
@@ -26,12 +32,26 @@ const stats = [
   { name: 'Tasa de Éxito', value: '98%', trend: '+2.4%', icon: Target, color: 'text-cyan-400', detail: 'IA Optimizada' },
 ]
 
-onMounted(() => {
+onMounted(async () => {
   const hasSeenPopup = localStorage.getItem('nexora_welcome_doc_seen')
   if (!hasSeenPopup) {
     showWelcomePopup.value = true
   }
+  
+  await fetchPendingUsers()
 })
+
+const fetchPendingUsers = async () => {
+  const { data } = await supabase.from('users').select('*').eq('is_verified', false)
+  pendingUsers.value = data || []
+}
+
+const verifyUser = async (userId) => {
+  const { error } = await supabase.from('users').update({ is_verified: true }).eq('id', userId)
+  if (!error) {
+    await fetchPendingUsers()
+  }
+}
 
 const closePopup = () => {
   showWelcomePopup.value = false
@@ -47,6 +67,34 @@ const goToDocs = () => {
 
 <template>
   <div class="space-y-8 lg:space-y-12 animate-fade-in pb-20">
+    <!-- Pending Verifications (For Super Admin) -->
+    <div v-if="pendingUsers.length > 0" class="animate-slide-up space-y-6">
+      <div class="flex items-center gap-3">
+        <ShieldAlert class="w-5 h-5 text-indigo-400" />
+        <h4 class="text-[10px] font-bold uppercase tracking-[0.4em]" style="color: var(--text-muted);">Verificaciones Pendientes</h4>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="user in pendingUsers" :key="user.id" class="stat-card p-6 flex flex-col gap-6 border-indigo-500/20">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+              <UserPlus class="w-6 h-6 text-indigo-400" />
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-black italic uppercase text-white">{{ user.full_name }}</p>
+              <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">{{ user.id.substring(0, 8) }}...</p>
+            </div>
+          </div>
+          <button 
+            @click="verifyUser(user.id)"
+            class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-500/20"
+          >
+            <Check class="w-3.5 h-3.5" /> VERIFICAR ACCESO
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Welcome documentation popup -->
     <div v-if="showWelcomePopup" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
       <div class="max-w-md w-full glass-panel border border-indigo-500/30 rounded-3xl p-8 space-y-6 shadow-3xl animate-slide-up relative">
