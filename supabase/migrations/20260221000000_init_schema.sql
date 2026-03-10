@@ -190,11 +190,11 @@ DROP POLICY IF EXISTS "Users can view their own profile" ON users;
 CREATE POLICY "Users can view their own profile" ON users
     FOR SELECT USING (auth.uid() = id);
 
--- Independent Policy for System Admins to see all profiles
+-- Independent Policy for System Admins to see all profiles using JWT metadata
 DROP POLICY IF EXISTS "System admins can manage all users" ON users;
 CREATE POLICY "System admins can manage all users" ON users
     FOR ALL USING (
-        (SELECT (raw_user_meta_data->>'is_system_admin')::boolean FROM auth.users WHERE id = auth.uid()) = TRUE
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
     );
 
 -- Business Users: Users can see their own business assignments
@@ -205,31 +205,48 @@ CREATE POLICY "Users can see their business assignments" ON business_users
 -- Customers Policy
 DROP POLICY IF EXISTS "Users can only see customers of their business" ON customers;
 CREATE POLICY "Users can only see customers of their business" ON customers
-    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        business_id = get_user_business_id() OR 
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 -- Products Policy
 DROP POLICY IF EXISTS "Users can only see products of their business" ON products;
 CREATE POLICY "Users can only see products of their business" ON products
-    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        business_id = get_user_business_id() OR 
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 -- Orders Policy
 DROP POLICY IF EXISTS "Users can only see orders of their business" ON orders;
 CREATE POLICY "Users can only see orders of their business" ON orders
-    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        business_id = get_user_business_id() OR 
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 -- Notifications Policy
 DROP POLICY IF EXISTS "Users can see their business notifications" ON notifications;
 CREATE POLICY "Users can see their business notifications" ON notifications
-    FOR ALL USING (business_id = get_user_business_id() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        business_id = get_user_business_id() OR 
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 -- Promotions: Everyone can see active, System Admins can manage
 DROP POLICY IF EXISTS "Everyone can see active promotions" ON promotions;
 CREATE POLICY "Everyone can see active promotions" ON promotions
-    FOR SELECT USING (status = 'active' OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR SELECT USING (
+        status = 'active' OR 
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 DROP POLICY IF EXISTS "System admins can manage promotions" ON promotions;
 CREATE POLICY "System admins can manage promotions" ON promotions
-    FOR ALL USING ((SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_customers_business ON customers(business_id);
