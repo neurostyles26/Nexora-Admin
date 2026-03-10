@@ -184,6 +184,7 @@ RETURNS UUID AS $$
 $$ LANGUAGE SQL STABLE SECURITY DEFINER;
 
 -- RLS Policies Example (Customers)
+DROP POLICY IF EXISTS "Users can only see customers of their business" ON customers;
 CREATE POLICY "Users can only see customers of their business" ON customers
     FOR ALL USING (business_id = get_user_business_id());
 
