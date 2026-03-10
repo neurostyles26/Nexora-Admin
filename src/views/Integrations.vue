@@ -93,6 +93,11 @@ const closeEditor = () => {
 <template>
   <div class="space-y-8 md:space-y-10 animate-fade-in pb-20">
     <!-- Header -->
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 py-4 md:py-8">
+      <div class="space-y-3">
+        <h1 class="page-title">Integraciones</h1>
+        <p class="page-subtitle">Ecosistema Digital Nexora. Conecta tu negocio al mundo.</p>
+      </div>
       <div class="flex flex-col sm:flex-row items-center gap-4">
         <button 
           @click="showDocumentation = !showDocumentation"
