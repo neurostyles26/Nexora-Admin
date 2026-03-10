@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS businesses (
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT,
+    email TEXT,
     avatar_url TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
     is_system_admin BOOLEAN DEFAULT FALSE,
@@ -32,6 +33,9 @@ DO $$
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_verified') THEN
         ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='email') THEN
+        ALTER TABLE users ADD COLUMN email TEXT;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_system_admin') THEN
         ALTER TABLE users ADD COLUMN is_system_admin BOOLEAN DEFAULT FALSE;
@@ -214,10 +218,11 @@ CREATE TRIGGER on_user_signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.users (id, full_name, avatar_url, is_verified, is_system_admin)
+    INSERT INTO public.users (id, full_name, email, avatar_url, is_verified, is_system_admin)
     VALUES (
         NEW.id, 
         NEW.raw_user_meta_data->>'full_name', 
+        NEW.email,
         NEW.raw_user_meta_data->>'avatar_url', 
         FALSE,
         COALESCE((NEW.raw_user_meta_data->>'is_system_admin')::boolean, FALSE)
