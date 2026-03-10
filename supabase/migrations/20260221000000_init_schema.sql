@@ -185,19 +185,22 @@ $$ LANGUAGE SQL STABLE SECURITY DEFINER;
 
 -- RLS Policies
 
--- Users Policy: Everyone can see their own profile, System Admins can see everything
+-- Users Policy: Everyone can see their own profile without recursion
 DROP POLICY IF EXISTS "Users can view their own profile" ON users;
 CREATE POLICY "Users can view their own profile" ON users
-    FOR SELECT USING (auth.uid() = id OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR SELECT USING (auth.uid() = id);
 
+-- Independent Policy for System Admins to see all profiles
 DROP POLICY IF EXISTS "System admins can manage all users" ON users;
 CREATE POLICY "System admins can manage all users" ON users
-    FOR ALL USING ((SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR ALL USING (
+        (SELECT (raw_user_meta_data->>'is_system_admin')::boolean FROM auth.users WHERE id = auth.uid()) = TRUE
+    );
 
 -- Business Users: Users can see their own business assignments
 DROP POLICY IF EXISTS "Users can see their business assignments" ON business_users;
 CREATE POLICY "Users can see their business assignments" ON business_users
-    FOR SELECT USING (user_id = auth.uid() OR (SELECT is_system_admin FROM users WHERE id = auth.uid()));
+    FOR SELECT USING (user_id = auth.uid());
 
 -- Customers Policy
 DROP POLICY IF EXISTS "Users can only see customers of their business" ON customers;
