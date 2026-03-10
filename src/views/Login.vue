@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import { Mail, Lock, Loader2, ArrowRight } from 'lucide-vue-next'
+import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -11,6 +11,7 @@ const email = ref('')
 const password = ref('')
 const errorMsg = ref('')
 const loading = ref(false)
+const showPassword = ref(false)
 
 const rememberMe = ref(false)
 
@@ -78,12 +79,22 @@ const handleLogin = async () => {
               <Lock class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 group-focus-within:text-indigo-400 transition-colors" style="color: var(--text-muted);" />
               <input 
                 v-model="password"
-                type="password" 
+                :type="showPassword ? 'text' : 'password'" 
                 required
-                class="relative w-full border rounded-xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium"
+                class="relative w-full border rounded-xl pl-12 pr-12 py-3.5 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium"
                 style="background: rgba(255,255,255,0.04); border-color: var(--border-primary); color: var(--text-primary);"
                 placeholder="••••••••"
               />
+              <button 
+                type="button"
+                @click="showPassword = !showPassword"
+                class="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-white/5 transition-colors group/eye"
+              >
+                <component 
+                  :is="showPassword ? EyeOff : Eye" 
+                  class="w-4 h-4 text-slate-500 group-hover/eye:text-indigo-400 transition-colors"
+                />
+              </button>
             </div>
           </div>
 
