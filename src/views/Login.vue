@@ -29,7 +29,7 @@ const handleLogin = async () => {
     
     router.push('/dashboard')
   } catch (err) {
-    errorMsg.value = 'Credenciales inválidas o error de conexión.'
+    errorMsg.value = err.message || 'Credenciales inválidas o error de conexión.'
     console.error(err)
   } finally {
     loading.value = false
