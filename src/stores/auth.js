@@ -28,11 +28,24 @@ export const useAuthStore = defineStore('auth', {
         async refreshProfile(user = null) {
             const currentUser = user || this.user
             if (!currentUser) return
-            const { data } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', currentUser.id).single()
-            this.user = {
-                ...currentUser,
-                is_verified: data?.is_verified,
-                is_system_admin: data?.is_system_admin
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('is_verified, is_system_admin')
+                    .eq('id', currentUser.id)
+                    .single()
+
+                if (error && error.code !== 'PGRST116') throw error
+
+                this.user = {
+                    ...currentUser,
+                    is_verified: data?.is_verified || false,
+                    is_system_admin: data?.is_system_admin || false
+                }
+            } catch (err) {
+                console.error('Error refreshing profile:', err)
+                // If profile fetch fails, we still keep the basic user info
+                this.user = { ...currentUser }
             }
         },
         async signIn(email, password, rememberMe = false) {
@@ -41,7 +54,14 @@ export const useAuthStore = defineStore('auth', {
             this.loading = false
             if (error) throw error
 
-            const { data: profile } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', data.user.id).single()
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('is_verified, is_system_admin')
+                .eq('id', data.user.id)
+                .single()
+
+            if (profileError && profileError.code !== 'PGRST116') throw profileError
+
             if (profile && !profile.is_verified && !profile.is_system_admin) {
                 // If not verified and NOT a system admin, we sign out
                 await supabase.auth.signOut()
@@ -50,8 +70,8 @@ export const useAuthStore = defineStore('auth', {
 
             this.user = {
                 ...data.user,
-                is_verified: profile?.is_verified,
-                is_system_admin: profile?.is_system_admin
+                is_verified: profile?.is_verified || false,
+                is_system_admin: profile?.is_system_admin || false
             }
             this.session = data.session
 
