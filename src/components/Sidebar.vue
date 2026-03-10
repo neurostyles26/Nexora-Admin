@@ -112,7 +112,9 @@ const handleLogout = async () => {
       <transition name="fade">
         <div v-if="!layoutStore.isSidebarCollapsed" class="mt-5 flex items-center gap-2 animate-fade-in px-3 py-1.5 rounded-full border" style="background: rgba(255,255,255,0.03); border-color: var(--border-primary);">
            <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_6px_#10b981]"></div>
-           <p class="text-[9px] font-black tracking-[0.25em] uppercase" style="color: var(--text-muted);">Control Maestro</p>
+           <p class="text-[9px] font-black tracking-[0.25em] uppercase" style="color: var(--text-muted);">
+             {{ authStore.user?.is_system_admin ? 'FUNDADOR NEXORA' : 'Panel Activo' }}
+           </p>
         </div>
       </transition>
     </div>

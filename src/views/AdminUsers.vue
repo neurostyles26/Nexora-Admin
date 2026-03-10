@@ -134,11 +134,17 @@ const deleteUser = async (userId) => {
             <tr v-else v-for="user in users" :key="user.id" class="hover:bg-white/[0.02] transition-colors group">
               <td class="px-8 py-6">
                 <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center border border-indigo-500/20 shadow-inner group-hover:scale-110 transition-transform shrink-0">
-                    <User class="w-6 h-6 text-indigo-400" />
+                  <div class="grow-0 shrink-0">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center border border-indigo-500/20 shadow-inner group-hover:scale-110 transition-transform">
+                      <ShieldCheck v-if="user.is_system_admin" class="w-6 h-6 text-indigo-400" />
+                      <User v-else class="w-6 h-6 text-slate-400" />
+                    </div>
                   </div>
                   <div class="space-y-1">
-                    <p class="text-sm font-black italic uppercase text-white group-hover:text-indigo-400 transition-colors">{{ user.full_name }}</p>
+                    <div class="flex items-center gap-2">
+                        <p class="text-sm font-black italic uppercase text-white group-hover:text-indigo-400 transition-colors">{{ user.full_name }}</p>
+                        <span v-if="user.is_system_admin" class="px-2 py-0.5 rounded-md bg-indigo-500/20 border border-indigo-500/30 text-[8px] font-black text-indigo-300 uppercase tracking-widest">FUNDADOR</span>
+                    </div>
                     <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                       <Mail class="w-3 h-3" />
                       {{ user.email || 'SIN EMAIL' }}
@@ -148,9 +154,12 @@ const deleteUser = async (userId) => {
               </td>
               <td class="px-8 py-6">
                 <div 
-                  @click="toggleVerification(user)"
-                  class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border cursor-pointer transition-all active:scale-95"
-                  :class="user.is_verified ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
+                  @click="!user.is_system_admin && toggleVerification(user)"
+                  class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border transition-all"
+                  :class="[
+                    user.is_verified ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+                    user.is_system_admin ? 'cursor-default' : 'cursor-pointer active:scale-95'
+                  ]"
                 >
                   <div class="w-1.5 h-1.5 rounded-full" :class="user.is_verified ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></div>
                   <span class="text-[9px] font-black uppercase tracking-[0.2em]">
@@ -161,18 +170,21 @@ const deleteUser = async (userId) => {
               <td class="px-8 py-6">
                 <div class="flex items-center justify-end gap-3">
                   <button 
+                    v-if="!user.is_system_admin"
                     class="p-3 rounded-xl bg-white/5 border border-[var(--border-primary)] hover:border-indigo-500/40 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400 transition-all active:scale-90"
                     title="Reset Contraseña"
                   >
                     <Key class="w-4 h-4" />
                   </button>
                   <button 
+                    v-if="!user.is_system_admin"
                     @click="deleteUser(user.id)"
                     class="p-3 rounded-xl bg-white/5 border border-[var(--border-primary)] hover:border-rose-500/40 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 transition-all active:scale-90"
                     title="Eliminar Usuario"
                   >
                     <Trash2 class="w-4 h-4" />
                   </button>
+                  <div v-else class="text-[10px] font-black text-indigo-400/30 uppercase tracking-widest italic px-3">PROTEGIDO</div>
                 </div>
               </td>
             </tr>
