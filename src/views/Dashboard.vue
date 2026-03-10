@@ -1,16 +1,92 @@
 <script setup>
-import { TrendingUp, Users, ShoppingBag, CreditCard, Sparkles, Zap, Globe, Target } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { 
+  TrendingUp, 
+  Users, 
+  ShoppingBag, 
+  CreditCard, 
+  Sparkles, 
+  Zap, 
+  Globe, 
+  Target,
+  BookOpen,
+  ArrowRight,
+  X,
+  Info
+} from 'lucide-vue-next'
+
+const router = useRouter()
+const showWelcomePopup = ref(false)
 
 const stats = [
-  { name: 'Ventas Totales', value: '$25,400', trend: '+14.2%', icon: CreditCard, color: 'text-emerald-400', detail: 'Sincronizado vía Sheets' },
-  { name: 'Comunidad Nexora', value: '1,280', trend: '+22.5%', icon: Users, color: 'text-indigo-400', detail: 'Nivel Plateado' },
-  { name: 'Pedidos Activos', value: '84', trend: '+8.1%', icon: ShoppingBag, color: 'text-purple-400', detail: 'Flujo Crítico' },
+  { name: 'Ventas Totales', value: '$12,845', trend: '+12.5%', icon: ShoppingBag, color: 'text-emerald-400', detail: 'Mes Actual' },
+  { name: 'Usuarios Activos', value: '1,240', trend: '+5.2%', icon: Users, color: 'text-indigo-400', detail: 'Últimas 24h' },
+  { name: 'Conversión', value: '3.8%', trend: '-1.4%', icon: TrendingUp, color: 'text-rose-400', detail: 'Global' },
   { name: 'Tasa de Éxito', value: '98%', trend: '+2.4%', icon: Target, color: 'text-cyan-400', detail: 'IA Optimizada' },
 ]
+
+onMounted(() => {
+  const hasSeenPopup = localStorage.getItem('nexora_welcome_doc_seen')
+  if (!hasSeenPopup) {
+    showWelcomePopup.value = true
+  }
+})
+
+const closePopup = () => {
+  showWelcomePopup.value = false
+  localStorage.setItem('nexora_welcome_doc_seen', 'true')
+}
+
+const goToDocs = () => {
+  showWelcomePopup.value = false
+  localStorage.setItem('nexora_welcome_doc_seen', 'true')
+  router.push('/integrations')
+}
 </script>
 
 <template>
   <div class="space-y-8 lg:space-y-12 animate-fade-in pb-20">
+    <!-- Welcome documentation popup -->
+    <div v-if="showWelcomePopup" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div class="max-w-md w-full glass-panel border border-indigo-500/30 rounded-3xl p-8 space-y-6 shadow-3xl animate-slide-up relative">
+        <button @click="closePopup" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-xl transition-colors group">
+          <X class="w-5 h-5 text-slate-400 group-hover:rotate-90 transition-transform" />
+        </button>
+        
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+            <BookOpen class="w-7 h-7 text-indigo-400" />
+          </div>
+          <div>
+            <h3 class="text-xl font-black italic uppercase tracking-tighter text-white">¡Bienvenido!</h3>
+            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Aviso de Configuración</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <p class="text-sm text-slate-300 leading-relaxed italic">
+            Revisa la <span class="text-indigo-400 font-bold">documentación paso a paso</span> para aprender cómo agregar <span class="text-yellow-400 font-bold">Power BI</span> y tus bases de datos al panel operativo.
+          </p>
+          
+          <div class="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex gap-3">
+            <Info class="w-5 h-5 text-indigo-400 shrink-0" />
+            <p class="text-[10px] text-slate-400 uppercase tracking-wider leading-relaxed">Configura el ecosistema digital de Nexora correctamente siguiendo la guía integrada.</p>
+          </div>
+        </div>
+        
+        <div class="flex flex-col gap-3">
+          <button @click="goToDocs" class="btn-primary py-4 px-6 text-xs font-black italic uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-indigo-500/20">
+            Ir a la Documentación
+            <ArrowRight class="w-4 h-4" />
+          </button>
+          <button @click="closePopup" class="py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-300 transition-colors italic">
+            Entendido, cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Header Section -->
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 py-4 md:py-8 border-b border-[var(--border-primary)]">
       <div class="space-y-4 md:space-y-6">

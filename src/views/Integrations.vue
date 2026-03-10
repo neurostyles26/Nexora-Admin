@@ -14,7 +14,11 @@ import {
   Link,
   Copy,
   Terminal,
-  X
+  X,
+  BookOpen,
+  Info,
+  HelpCircle,
+  ArrowUpRight
 } from 'lucide-vue-next'
 import { useIntegrationsStore } from '../stores/integrations'
 import SheetEditor from '../components/SheetEditor.vue'
@@ -26,6 +30,7 @@ const spreadsheetInput = ref('')
 const deployedUrlInput = ref('')
 const showHookModal = ref(false)
 const showDetail = ref(false)
+const showDocumentation = ref(false)
 const connectionError = ref('')
 const spreadsheetUrlError = ref('')
 
@@ -88,14 +93,93 @@ const closeEditor = () => {
 <template>
   <div class="space-y-8 md:space-y-10 animate-fade-in pb-20">
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 py-4 md:py-8">
-      <div class="space-y-3">
-        <h1 class="page-title">Integraciones</h1>
-        <p class="page-subtitle">Ecosistema Digital Nexora. Conecta tu negocio al mundo.</p>
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <button 
+          @click="showDocumentation = !showDocumentation"
+          class="flex items-center gap-3 px-6 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl shadow-lg hover:bg-indigo-500/20 transition-all active:scale-95 group"
+        >
+          <BookOpen class="w-4 h-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
+          <span class="text-[10px] font-bold text-indigo-100 uppercase tracking-[0.2em]">{{ showDocumentation ? 'Cerrar Documentación' : 'Documentación' }}</span>
+        </button>
+        <div class="flex items-center gap-3 px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl shadow-lg">
+           <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
+           <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.2em]">ACTIVO</span>
+        </div>
       </div>
-      <div class="flex items-center gap-3 px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl shadow-lg self-start lg:self-auto">
-         <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-         <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.2em]">ACTIVO</span>
+    </div>
+
+    <!-- Documentation Section -->
+    <div v-if="showDocumentation" class="animate-slide-up space-y-8">
+      <div class="glass-panel border border-indigo-500/20 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-8 opacity-10">
+          <BookOpen class="w-32 h-32 text-indigo-400" />
+        </div>
+        
+        <div class="relative z-10 space-y-12">
+          <div class="space-y-4">
+            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-white">Guía de Integración Nexora</h2>
+            <p class="text-slate-400 max-w-2xl leading-relaxed">Sigue estos pasos detallados para conectar tus fuentes de datos externas con el panel administrativo de Nexora.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <!-- Google Sheets Docs -->
+            <div class="space-y-6">
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <FileSpreadsheet class="w-6 h-6 text-emerald-400" />
+                </div>
+                <h3 class="text-xl font-bold uppercase italic text-emerald-400">Google Sheets</h3>
+              </div>
+              
+              <div class="space-y-4">
+                <div v-for="(step, i) in [
+                  { t: 'Preparar la Hoja', d: 'Tu Google Sheet debe tener encabezados claros en la primera fila (ID, Nombre, Precio, etc).' },
+                  { t: 'Acceder a Apps Script', d: 'Ve a Extensiones > Apps Script dentro de tu hoja de cálculo.' },
+                  { t: 'Instalar el Bridge', d: 'Copia el código del \'Hook de Conexión\' que proporcionamos al intentar vincular y pégalo en el editor.' },
+                  { t: 'Desplegar', d: 'Haz clic en Desplegar > Nueva implementación > Aplicación web. Configura el acceso para \'Cualquier persona\'.' }
+                ]" :key="i" class="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-all">
+                  <span class="text-emerald-400 font-black italic text-lg opacity-40">{{ i + 1 }}</span>
+                  <div class="space-y-1">
+                    <p class="text-sm font-bold text-slate-200 uppercase tracking-wide">{{ step.t }}</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">{{ step.d }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Power BI Docs -->
+            <div class="space-y-6">
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                  <BarChartHorizontal class="w-6 h-6 text-yellow-400" />
+                </div>
+                <h3 class="text-xl font-bold uppercase italic text-yellow-400">Power BI Desktop</h3>
+              </div>
+              
+              <div class="space-y-4">
+                <div v-for="(step, i) in [
+                  { t: 'Obtener Datos', d: 'En Power BI Desktop, selecciona \'Obtener datos\' > \'Base de datos PostgreSQL\'.' },
+                  { t: 'Configurar Servidor', d: 'Ingresa el Host (db.czcrcamukofdsyjdkact.supabase.co) y la base de datos (postgres).' },
+                  { t: 'Credenciales', d: 'Selecciona \'Base de datos\' en el panel izquierdo e ingresa el usuario (postgres) y tu Secret Password.' },
+                  { t: 'Modo DirectQuery', d: 'Elige \'DirectQuery\' para ver los datos en tiempo real sin necesidad de actualizar manualmente.' }
+                ]" :key="i" class="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-yellow-500/20 transition-all">
+                  <span class="text-yellow-400 font-black italic text-lg opacity-40">{{ i + 1 }}</span>
+                  <div class="space-y-1">
+                    <p class="text-sm font-bold text-slate-200 uppercase tracking-wide">{{ step.t }}</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">{{ step.d }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl flex items-start gap-4">
+                <Info class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                <p class="text-[10px] text-slate-400 leading-relaxed uppercase tracking-wider italic">
+                  Para una conexión exitosa, asegúrate de tener instalado el <a href="https://npgsql.org/doc/installation.html" target="_blank" class="text-indigo-400 font-bold hover:underline">Driver Npgsql</a> en tu sistema.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
