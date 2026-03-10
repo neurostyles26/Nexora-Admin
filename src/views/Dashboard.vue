@@ -67,8 +67,35 @@ const goToDocs = () => {
 
 <template>
   <div class="space-y-8 lg:space-y-12 animate-fade-in pb-20">
+    <!-- Founder Console Welcome -->
+    <div v-if="authStore.user?.is_system_admin" class="animate-slide-up relative overflow-hidden rounded-3xl p-8 border border-indigo-500/30 shadow-2xl shadow-indigo-500/10 mb-12" style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));">
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40">
+              <span class="text-[9px] font-black text-indigo-300 uppercase tracking-[0.3em]">Acceso Primordial</span>
+            </div>
+            <Sparkles class="w-4 h-4 text-indigo-400 animate-pulse" />
+          </div>
+          <div>
+            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-white">Consola de Fundador</h2>
+            <p class="text-sm italic text-slate-400 mt-1">Soberanía total sobre el ecosistema Nexora.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 bg-white/[0.02] border border-white/5 p-4 rounded-2xl backdrop-blur-sm">
+           <div class="space-y-1">
+              <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Estado del Núcleo</p>
+              <p class="text-xs font-black text-emerald-400 italic">ACTIVO & SINCRONIZADO</p>
+           </div>
+           <div class="w-px h-8 bg-white/10"></div>
+           <Shield class="w-6 h-6 text-indigo-400/50" />
+        </div>
+      </div>
+    </div>
+
     <!-- Pending Verifications (For Super Admin) -->
-    <div v-if="pendingUsers.length > 0" class="animate-slide-up space-y-6">
+    <div v-if="authStore.user?.is_system_admin && pendingUsers.length > 0" class="animate-slide-up space-y-6">
       <div class="flex items-center gap-3">
         <ShieldAlert class="w-5 h-5 text-indigo-400" />
         <h4 class="text-[10px] font-bold uppercase tracking-[0.4em]" style="color: var(--text-muted);">Verificaciones Pendientes</h4>

@@ -19,16 +19,21 @@ export const useAuthStore = defineStore('auth', {
             supabase.auth.onAuthStateChange(async (_event, session) => {
                 this.session = session
                 if (session?.user) {
-                    const { data } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', session.user.id).single()
-                    this.user = {
-                        ...session.user,
-                        is_verified: data?.is_verified,
-                        is_system_admin: data?.is_system_admin
-                    }
+                    await this.refreshProfile(session.user)
                 } else {
                     this.user = null
                 }
             })
+        },
+        async refreshProfile(user = null) {
+            const currentUser = user || this.user
+            if (!currentUser) return
+            const { data } = await supabase.from('users').select('is_verified, is_system_admin').eq('id', currentUser.id).single()
+            this.user = {
+                ...currentUser,
+                is_verified: data?.is_verified,
+                is_system_admin: data?.is_system_admin
+            }
         },
         async signIn(email, password, rememberMe = false) {
             this.loading = true
