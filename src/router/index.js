@@ -28,6 +28,7 @@ const routes = [
             { path: 'products', name: 'Products', component: () => import('../views/Products.vue') },
             { path: 'orders', name: 'Orders', component: () => import('../views/Orders.vue') },
             { path: 'settings', name: 'Settings', component: () => import('../views/Settings.vue') },
+            { path: 'pdf-converter', name: 'PDFConverter', component: () => import('../views/PDFConverter.vue') },
             // Global Admin Routes
             { path: 'admin/users', name: 'AdminUsers', component: () => import('../views/AdminUsers.vue') },
             { path: 'admin/promotions', name: 'Promotions', component: () => import('../views/Promotions.vue') },

@@ -13,7 +13,8 @@ import {
   Shield,
   TicketPercent,
   History,
-  Database
+  Database,
+  FileSpreadsheet
 } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
 import { useLayoutStore } from '../stores/layout'
@@ -26,6 +27,7 @@ const menuItems = [
   { name: 'Comunidad', icon: Users, path: '/dashboard/customers' },
   { name: 'Catálogo', icon: Package, path: '/dashboard/products' },
   { name: 'Transacciones', icon: ShoppingCart, path: '/dashboard/orders' },
+  { name: 'Convertidor PDF', icon: FileSpreadsheet, path: '/dashboard/pdf-converter' },
   { name: 'Ecosistema', icon: BarChart2, path: '/dashboard/integrations' },
 ]
 
