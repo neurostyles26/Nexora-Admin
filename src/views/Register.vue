@@ -10,6 +10,7 @@ const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 const fullName = ref('')
+const businessName = ref('')
 const loading = ref(false)
 const showPassword = ref(false)
 const registered = ref(false)
@@ -19,7 +20,7 @@ const handleRegister = async () => {
   try {
     loading.value = true
     errorMsg.value = ''
-    await authStore.signUp(email.value, password.value, fullName.value)
+    await authStore.signUp(email.value, password.value, fullName.value, businessName.value)
     registered.value = true
   } catch (err) {
     errorMsg.value = err.message || 'Error al crear la cuenta. Inténtalo de nuevo.'
@@ -70,6 +71,21 @@ const handleRegister = async () => {
                   class="relative w-full border rounded-xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium"
                   style="background: rgba(255,255,255,0.04); border-color: var(--border-primary); color: var(--text-primary);"
                   placeholder="Tu nombre completo"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-[0.2em] ml-1" style="color: var(--text-muted);">Nombre de Empresa / Proyecto</label>
+              <div class="relative group">
+                <Sparkles class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 group-focus-within:text-indigo-400 transition-colors" style="color: var(--text-muted);" />
+                <input 
+                  v-model="businessName"
+                  type="text" 
+                  required
+                  class="relative w-full border rounded-xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium"
+                  style="background: rgba(255,255,255,0.04); border-color: var(--border-primary); color: var(--text-primary);"
+                  placeholder="Ej: Nexora Digital"
                 />
               </div>
             </div>

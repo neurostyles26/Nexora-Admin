@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
     is_system_admin BOOLEAN DEFAULT FALSE,
+    metadata JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -39,6 +40,9 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_system_admin') THEN
         ALTER TABLE users ADD COLUMN is_system_admin BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='metadata') THEN
+        ALTER TABLE users ADD COLUMN metadata JSONB DEFAULT '{}'::jsonb;
     END IF;
 END $$;
 
@@ -278,16 +282,30 @@ CREATE TRIGGER on_user_signup
 -- Sync Supabase Auth with public.users
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    is_sys_admin BOOLEAN;
+    business_name TEXT;
+    new_business_id UUID;
 BEGIN
-    INSERT INTO public.users (id, full_name, email, avatar_url, is_verified, is_system_admin)
+    -- Only allow setting system admin from raw_user_meta_data if we trust the source (e.g., set manually in DB)
+    -- For public signups, COALESCE ensures it defaults to FALSE if not provided or provided by user
+    is_sys_admin := COALESCE((NEW.raw_user_meta_data->>'is_system_admin')::boolean, FALSE);
+    business_name := COALESCE(NEW.raw_user_meta_data->>'business_name', 'Nueva Empresa');
+
+    INSERT INTO public.users (id, full_name, email, avatar_url, is_verified, is_system_admin, metadata)
     VALUES (
         NEW.id, 
         NEW.raw_user_meta_data->>'full_name', 
         NEW.email,
         NEW.raw_user_meta_data->>'avatar_url', 
-        FALSE,
-        COALESCE((NEW.raw_user_meta_data->>'is_system_admin')::boolean, FALSE)
+        is_sys_admin, -- System admins are auto-verified
+        is_sys_admin,
+        NEW.raw_user_meta_data
     );
+
+    -- If it's a new client (NOT system admin), we could optionally create a business here
+    -- But it's better to do it during the verification phase in the Admin UI.
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

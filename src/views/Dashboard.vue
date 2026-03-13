@@ -42,7 +42,11 @@ onMounted(async () => {
 })
 
 const fetchPendingUsers = async () => {
-  const { data } = await supabase.from('users').select('*').eq('is_verified', false)
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('is_verified', false)
+    .eq('is_system_admin', false)
   pendingUsers.value = data || []
 }
 
@@ -109,7 +113,8 @@ const goToDocs = () => {
             </div>
             <div class="space-y-1">
               <p class="text-sm font-black italic uppercase text-white">{{ user.full_name }}</p>
-              <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">{{ user.id.substring(0, 8) }}...</p>
+              <p v-if="user.metadata?.business_name" class="text-[9px] font-bold uppercase tracking-wider text-indigo-400">{{ user.metadata.business_name }}</p>
+              <p v-else class="text-[9px] font-bold uppercase tracking-wider text-slate-500">{{ user.id.substring(0, 8) }}...</p>
             </div>
           </div>
           <button 

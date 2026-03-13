@@ -31,16 +31,29 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const { data, error } = await supabase
                     .from('users')
-                    .select('is_verified, is_system_admin')
+                    .select('is_verified, is_system_admin, full_name')
                     .eq('id', currentUser.id)
                     .single()
 
                 if (error && error.code !== 'PGRST116') throw error
 
+                // Fetch business if not system admin
+                let business = null
+                if (data && !data.is_system_admin) {
+                    const { data: busData } = await supabase
+                        .from('business_users')
+                        .select('business_id, role, businesses(*)')
+                        .eq('user_id', currentUser.id)
+                        .single()
+                    business = busData
+                }
+
                 this.user = {
                     ...currentUser,
+                    full_name: data?.full_name || currentUser.user_metadata?.full_name,
                     is_verified: data?.is_verified || false,
-                    is_system_admin: data?.is_system_admin || false
+                    is_system_admin: data?.is_system_admin || false,
+                    business: business
                 }
             } catch (err) {
                 console.error('Error refreshing profile:', err)
@@ -68,11 +81,7 @@ export const useAuthStore = defineStore('auth', {
                 throw new Error('Tu cuenta está pendiente de verificación por un administrador.')
             }
 
-            this.user = {
-                ...data.user,
-                is_verified: profile?.is_verified || false,
-                is_system_admin: profile?.is_system_admin || false
-            }
+            await this.refreshProfile(data.user)
             this.session = data.session
 
             if (rememberMe) {
@@ -83,12 +92,17 @@ export const useAuthStore = defineStore('auth', {
                 sessionStorage.setItem('nexora_volatile_session', 'true')
             }
         },
-        async signUp(email, password, fullName) {
+        async signUp(email, password, fullName, businessName = '') {
             this.loading = true
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
-                options: { data: { full_name: fullName } }
+                options: { 
+                    data: { 
+                        full_name: fullName,
+                        business_name: businessName
+                    } 
+                }
             })
             this.loading = false
             if (error) throw error

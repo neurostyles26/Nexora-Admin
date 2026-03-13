@@ -11,7 +11,8 @@ import {
   Search,
   Filter,
   MoreVertical,
-  ChevronDown
+  ChevronDown,
+  Building2
 } from 'lucide-vue-next'
 
 const users = ref([])
@@ -43,14 +44,44 @@ const fetchUsers = async () => {
 
 const toggleVerification = async (user) => {
   try {
+    const newStatus = !user.is_verified
+    
+    // If we are verifying a new client, we should create their business first
+    if (newStatus && !user.is_system_admin) {
+        const businessName = user.metadata?.business_name || `Empresa de ${user.full_name}`
+        const slug = businessName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') + '-' + Math.random().toString(36).substring(2, 7)
+        
+        // 1. Create Business
+        const { data: business, error: busError } = await supabase
+            .from('businesses')
+            .insert({ name: businessName, slug: slug })
+            .select()
+            .single()
+            
+        if (busError) throw busError
+        
+        // 2. Link User to Business as Business Admin
+        const { error: linkError } = await supabase
+            .from('business_users')
+            .insert({ 
+                business_id: business.id, 
+                user_id: user.id,
+                role: 'business_admin'
+            })
+            
+        if (linkError) throw linkError
+    }
+
     const { error } = await supabase
       .from('users')
-      .update({ is_verified: !user.is_verified })
+      .update({ is_verified: newStatus })
       .eq('id', user.id)
+      
     if (error) throw error
     await fetchUsers()
   } catch (err) {
     console.error('Error toggling verification:', err)
+    alert('Error al procesar la verificación: ' + err.message)
   }
 }
 
@@ -145,9 +176,15 @@ const deleteUser = async (userId) => {
                         <p class="text-sm font-black italic uppercase text-white group-hover:text-indigo-400 transition-colors">{{ user.full_name }}</p>
                         <span v-if="user.is_system_admin" class="px-2 py-0.5 rounded-md bg-indigo-500/20 border border-indigo-500/30 text-[8px] font-black text-indigo-300 uppercase tracking-widest">FUNDADOR</span>
                     </div>
-                    <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                      <Mail class="w-3 h-3" />
-                      {{ user.email || 'SIN EMAIL' }}
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                          <Mail class="w-3 h-3" />
+                          {{ user.email || 'SIN EMAIL' }}
+                        </div>
+                        <div v-if="user.metadata?.business_name" class="flex items-center gap-2 text-[9px] font-black text-indigo-400/60 uppercase tracking-wider italic">
+                          <Building2 class="w-3 h-3" />
+                          {{ user.metadata.business_name }}
+                        </div>
                     </div>
                   </div>
                 </div>
