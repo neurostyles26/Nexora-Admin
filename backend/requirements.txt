@@ -5,7 +5,7 @@ docling
 camelot-py[cv]
 opencv-python-headless
 paddleocr
-paddlepaddle
+paddlepaddle==2.6.1
 python-docx
 openpyxl
 pymupdf
