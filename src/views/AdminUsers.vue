@@ -12,7 +12,9 @@ import {
   Filter,
   MoreVertical,
   ChevronDown,
-  Building2
+  Building2,
+  Check,
+  X as XIcon
 } from 'lucide-vue-next'
 
 const users = ref([])
@@ -42,12 +44,11 @@ const fetchUsers = async () => {
   }
 }
 
-const toggleVerification = async (user) => {
+const acceptUser = async (user) => {
   try {
-    const newStatus = !user.is_verified
-    
+    loading.value = true
     // If we are verifying a new client, we should create their business first
-    if (newStatus && !user.is_system_admin) {
+    if (!user.is_system_admin) {
         const businessName = user.metadata?.business_name || `Empresa de ${user.full_name}`
         const slug = businessName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') + '-' + Math.random().toString(36).substring(2, 7)
         
@@ -74,14 +75,33 @@ const toggleVerification = async (user) => {
 
     const { error } = await supabase
       .from('users')
-      .update({ is_verified: newStatus })
+      .update({ is_verified: true })
       .eq('id', user.id)
       
     if (error) throw error
     await fetchUsers()
   } catch (err) {
-    console.error('Error toggling verification:', err)
-    alert('Error al procesar la verificación: ' + err.message)
+    console.error('Error accepting user:', err)
+    alert('Error al aceptar usuario: ' + err.message)
+  } finally {
+    loading.value = false
+  }
+}
+
+const rejectUser = async (user) => {
+  if (!confirm(`¿Estás seguro de que deseas rechazar y eliminar a ${user.full_name}?`)) return
+  try {
+    loading.value = true
+    // Deleting the user will trigger cascade if properly configured, 
+    // but in many setups we just delete the user record.
+    const { error } = await supabase.from('users').delete().eq('id', user.id)
+    if (error) throw error
+    await fetchUsers()
+  } catch (err) {
+    console.error('Error rejecting user:', err)
+    alert('Error al rechazar usuario: ' + err.message)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -191,12 +211,8 @@ const deleteUser = async (userId) => {
               </td>
               <td class="px-8 py-6">
                 <div 
-                  @click="!user.is_system_admin && toggleVerification(user)"
                   class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border transition-all"
-                  :class="[
-                    user.is_verified ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400',
-                    user.is_system_admin ? 'cursor-default' : 'cursor-pointer active:scale-95'
-                  ]"
+                  :class="user.is_verified ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
                 >
                   <div class="w-1.5 h-1.5 rounded-full" :class="user.is_verified ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></div>
                   <span class="text-[9px] font-black uppercase tracking-[0.2em]">
@@ -206,21 +222,30 @@ const deleteUser = async (userId) => {
               </td>
               <td class="px-8 py-6">
                 <div class="flex items-center justify-end gap-3">
-                  <button 
-                    v-if="!user.is_system_admin"
-                    class="p-3 rounded-xl bg-white/5 border border-[var(--border-primary)] hover:border-indigo-500/40 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400 transition-all active:scale-90"
-                    title="Reset Contraseña"
-                  >
-                    <Key class="w-4 h-4" />
-                  </button>
-                  <button 
-                    v-if="!user.is_system_admin"
-                    @click="deleteUser(user.id)"
-                    class="p-3 rounded-xl bg-white/5 border border-[var(--border-primary)] hover:border-rose-500/40 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 transition-all active:scale-90"
-                    title="Eliminar Usuario"
-                  >
-                    <Trash2 class="w-4 h-4" />
-                  </button>
+                  <template v-if="!user.is_system_admin">
+                    <template v-if="!user.is_verified">
+                         <button 
+                            @click="acceptUser(user)"
+                            class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all active:scale-90"
+                            title="Aceptar Usuario"
+                          >
+                            <Check class="w-4 h-4" />
+                          </button>
+                    </template>
+                    <button 
+                        @click="rejectUser(user)"
+                        class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all active:scale-90"
+                        title="Rechazar/Eliminar"
+                      >
+                        <XIcon class="w-4 h-4" />
+                      </button>
+                    <button 
+                      class="p-2.5 rounded-xl bg-white/5 border border-[var(--border-primary)] hover:border-indigo-500/40 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400 transition-all active:scale-90"
+                      title="Reset Contraseña"
+                    >
+                      <Key class="w-4 h-4" />
+                    </button>
+                  </template>
                   <div v-else class="text-[10px] font-black text-indigo-400/30 uppercase tracking-widest italic px-3">PROTEGIDO</div>
                 </div>
               </td>

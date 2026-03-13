@@ -50,10 +50,62 @@ const fetchPendingUsers = async () => {
   pendingUsers.value = data || []
 }
 
-const verifyUser = async (userId) => {
-  const { error } = await supabase.from('users').update({ is_verified: true }).eq('id', userId)
-  if (!error) {
-    await fetchPendingUsers()
+const acceptUser = async (user) => {
+  try {
+    // If we are verifying a new client, we should create their business first
+    if (!user.is_system_admin) {
+        const businessName = user.metadata?.business_name || `Empresa de ${user.full_name}`
+        const slug = businessName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') + '-' + Math.random().toString(36).substring(2, 7)
+        
+        // 1. Create Business
+        const { data: business, error: busError } = await supabase
+            .from('businesses')
+            .insert({ name: businessName, slug: slug })
+            .select()
+            .single()
+            
+        if (busError) throw busError
+        
+        // 2. Link User to Business as Business Admin
+        const { error: linkError } = await supabase
+            .from('business_users')
+            .insert({ 
+                business_id: business.id, 
+                user_id: user.id,
+                role: 'business_admin'
+            })
+            
+        if (linkError) throw linkError
+    }
+
+    const { error } = await supabase
+      .from('users')
+      .update({ is_verified: true })
+      .eq('id', user.id)
+      
+    if (!error) {
+      await fetchPendingUsers()
+    } else {
+        throw error
+    }
+  } catch (err) {
+    console.error('Error accepting user:', err)
+    alert('Error al procesar la verificación: ' + err.message)
+  }
+}
+
+const rejectUser = async (user) => {
+  if (!confirm(`¿Rechazar a ${user.full_name}?`)) return
+  try {
+    const { error } = await supabase.from('users').delete().eq('id', user.id)
+    if (!error) {
+      await fetchPendingUsers()
+    } else {
+        throw error
+    }
+  } catch (err) {
+    console.error('Error rejecting user:', err)
+    alert('Error al rechazar: ' + err.message)
   }
 }
 
@@ -117,12 +169,20 @@ const goToDocs = () => {
               <p v-else class="text-[9px] font-bold uppercase tracking-wider text-slate-500">{{ user.id.substring(0, 8) }}...</p>
             </div>
           </div>
-          <button 
-            @click="verifyUser(user.id)"
-            class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-500/20"
-          >
-            <Check class="w-3.5 h-3.5" /> VERIFICAR ACCESO
-          </button>
+          <div class="flex items-center gap-3">
+            <button 
+              @click="acceptUser(user)"
+              class="flex-1 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-500/20"
+            >
+              <Check class="w-3.5 h-3.5" /> ACEPTAR
+            </button>
+            <button 
+              @click="rejectUser(user)"
+              class="w-12 py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 transition-all flex items-center justify-center active:scale-95"
+            >
+              <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

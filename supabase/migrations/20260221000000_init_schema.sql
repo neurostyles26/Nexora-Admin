@@ -206,6 +206,19 @@ DROP POLICY IF EXISTS "Users can see their business assignments" ON business_use
 CREATE POLICY "Users can see their business assignments" ON business_users
     FOR SELECT USING (user_id = auth.uid());
 
+-- System Admin Policy for Business Management
+DROP POLICY IF EXISTS "System admins can manage all businesses" ON businesses;
+CREATE POLICY "System admins can manage all businesses" ON businesses
+    FOR ALL USING (
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
+
+DROP POLICY IF EXISTS "System admins can manage all business user links" ON business_users;
+CREATE POLICY "System admins can manage all business user links" ON business_users
+    FOR ALL USING (
+        (auth.jwt() -> 'user_metadata' ->> 'is_system_admin')::boolean = TRUE
+    );
+
 -- Customers Policy
 DROP POLICY IF EXISTS "Users can only see customers of their business" ON customers;
 CREATE POLICY "Users can only see customers of their business" ON customers
