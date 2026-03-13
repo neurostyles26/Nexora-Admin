@@ -3,8 +3,9 @@ import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 
-// Initialize PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Initialize PDF.js worker correctly for Vite
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 /**
  * Extracts text content from a PDF and attempts to group it into a table structure.
@@ -12,8 +13,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
  * @returns {Promise<Array<Array<string>>>} - A 2D array representing the table data.
  */
 export const extractTableFromPDF = async (file) => {
+    console.log('[PDF] Processing file:', file.name);
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+    const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    console.log('[PDF] Pages loaded:', pdf.numPages);
     let allRows = [];
 
     for (let i = 1; i <= pdf.numPages; i++) {

@@ -210,29 +210,32 @@ const triggerFileInput = () => {
               </div>
             </div>
 
-            <div class="flex items-center gap-4 w-full md:w-auto">
+            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
               <button 
                 @click="removeFile"
                 class="p-4 rounded-xl border border-[var(--border-primary)] hover:bg-rose-500/10 hover:text-rose-400 transition-all group"
+                title="Eliminar archivo"
               >
                 <X class="w-5 h-5 text-slate-500 group-hover:rotate-90 transition-transform" />
               </button>
               
-              <button 
-                @click="handleDownload"
-                class="flex-1 md:flex-none btn-secondary py-4 px-8 text-[10px] font-black italic uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 shadow-lg border border-indigo-500/20"
-              >
-                Descargar Excel
-                <Download class="w-4 h-4" />
-              </button>
+              <div class="flex flex-1 md:flex-none gap-3">
+                <button 
+                  @click="handleDownload"
+                  class="flex-1 md:flex-none btn-secondary py-4 px-8 text-[10px] font-black italic uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 shadow-lg border border-indigo-500/20"
+                >
+                  Excel (.xlsx)
+                  <Download class="w-4 h-4" />
+                </button>
 
-              <button 
-                @click="handleDownloadWord"
-                class="flex-1 md:flex-none btn-primary py-4 px-8 text-[10px] font-black italic uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-indigo-500/20"
-              >
-                Descargar Word
-                <FileDoc class="w-4 h-4" />
-              </button>
+                <button 
+                  @click="handleDownloadWord"
+                  class="flex-1 md:flex-none btn-primary py-4 px-8 text-[10px] font-black italic uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-indigo-500/20"
+                >
+                  Word (.docx)
+                  <FileDoc class="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -252,11 +255,27 @@ const triggerFileInput = () => {
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- Warning / Error -->
-        <div v-if="error" class="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-start gap-4 animate-shake">
-          <AlertCircle class="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-          <p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider leading-relaxed">{{ error }}</p>
+      <!-- Warning / Error State -->
+      <div v-if="error" class="animate-shake space-y-4">
+        <div class="glass-panel rounded-[2rem] p-8 border border-rose-500/20 bg-rose-500/5 flex items-start gap-6">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20">
+            <AlertCircle class="w-6 h-6 text-rose-400" />
+          </div>
+          <div class="space-y-2">
+            <h4 class="text-sm font-black italic uppercase tracking-widest text-white">Interrupción en el Proceso</h4>
+            <p class="text-[11px] text-rose-400 font-bold uppercase tracking-wider leading-relaxed">{{ error }}</p>
+          </div>
+        </div>
+        
+        <div class="flex justify-center">
+          <button 
+             @click="removeFile"
+             class="text-[10px] font-black italic uppercase tracking-[0.3em] text-slate-500 hover:text-indigo-400 transition-colors"
+          >
+             Intentar de nuevo con otro archivo
+          </button>
         </div>
       </div>
     </div>
