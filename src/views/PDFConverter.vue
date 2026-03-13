@@ -244,7 +244,7 @@ const triggerFileInput = () => {
             <div class="flex items-center gap-3">
               <Sparkles class="w-4 h-4 text-indigo-400" />
               <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                Documento analizado: {{ extractedData.filter(b => b.type === 'table').length }} tablas y {{ extractedData.filter(b => b.type === 'text').length }} párrafos detectados.
+                 Motor de IA de Nexora listo para la conversión de alta fidelidad.
               </p>
             </div>
             

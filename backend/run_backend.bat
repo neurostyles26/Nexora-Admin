@@ -1,0 +1,6 @@
+@echo off
+echo Instalando dependencias del motor de IA...
+pip install -r requirements.txt
+echo Iniciando servidor Nexora PDF Engine en http://localhost:8000...
+python main.py
+pause

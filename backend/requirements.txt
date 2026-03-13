@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+docling
+camelot-py[cv]
+paddleocr
+paddlepaddle
+python-docx
+openpyxl
+file-saver
+python-magic
