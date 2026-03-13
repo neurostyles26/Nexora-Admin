@@ -243,7 +243,9 @@ const triggerFileInput = () => {
           <div class="mt-8 pt-8 border-t border-indigo-500/10 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <Sparkles class="w-4 h-4 text-indigo-400" />
-              <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Se han detectado {{ extractedData.length }} filas de datos potenciales.</p>
+              <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">
+                Documento analizado: {{ extractedData.filter(b => b.type === 'table').length }} tablas y {{ extractedData.filter(b => b.type === 'text').length }} párrafos detectados.
+              </p>
             </div>
             
             <button 
