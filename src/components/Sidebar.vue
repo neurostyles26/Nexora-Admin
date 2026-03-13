@@ -14,11 +14,14 @@ import {
   TicketPercent,
   History,
   Database,
-  FileSpreadsheet
+  FileSpreadsheet,
+  PanelLeftClose
 } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLayoutStore } from '../stores/layout'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const layoutStore = useLayoutStore()
 
@@ -39,7 +42,14 @@ const adminItems = [
 ]
 
 const handleLogout = async () => {
-  await authStore.signOut()
+  try {
+    await authStore.signOut()
+    router.push('/login')
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error)
+    // Fallback redirect even if signOut fails
+    router.push('/login')
+  }
 }
 </script>
 
