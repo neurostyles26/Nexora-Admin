@@ -7,5 +7,5 @@ paddleocr
 paddlepaddle
 python-docx
 openpyxl
-file-saver
+pymupdf
 python-magic

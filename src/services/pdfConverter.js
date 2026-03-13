@@ -67,7 +67,10 @@ export const downloadAsWord = async (blocks, fileName = 'converted_data.docx') =
             body: formData
         });
 
-        if (!response.ok) throw new Error('Error en el servidor de conversión de Word.');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Error en el servidor de conversión de Word.');
+        }
 
         const blob = await response.blob();
         saveAs(blob, fileName);

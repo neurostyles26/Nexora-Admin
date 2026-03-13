@@ -79,7 +79,7 @@ const handleDownloadWord = async () => {
     try {
       await downloadAsWord(extractedData.value, fileName.value.replace('.pdf', '') + '_convertido.docx')
     } catch (err) {
-      error.value = 'Error al generar el documento Word.'
+      error.value = err.message || 'Error al generar el documento Word.'
     } finally {
       isProcessing.value = false
     }
