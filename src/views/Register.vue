@@ -51,7 +51,7 @@ const handleRegister = async () => {
 
         <div v-if="!registered">
           <div class="text-center mb-8">
-            <h2 class="text-2xl font-black tracking-tight italic" style="color: var(--text-primary);">Registro Admin</h2>
+            <h2 class="text-2xl font-black tracking-tight italic" style="color: var(--text-primary); font-family: 'Montserrat', sans-serif;">Registro Admin</h2>
             <p class="text-sm mt-2 font-medium italic" style="color: var(--text-secondary);">Únete al ecosistema inteligente</p>
           </div>
 

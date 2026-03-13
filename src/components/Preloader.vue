@@ -9,8 +9,8 @@ onMounted(() => {
     startExit.value = true
     setTimeout(() => {
       loading.value = false
-    }, 1200)
-  }, 2800)
+    }, 1500)
+  }, 3500) // Slightly longer for more "weight"
 })
 </script>
 
@@ -22,21 +22,22 @@ onMounted(() => {
       
       <div class="relative flex flex-col items-center">
         <!-- Main Logo Container -->
-        <div class="relative w-48 h-48 flex items-center justify-center group" :class="{ 'cx-exit': startExit }">
+        <div class="relative w-64 h-64 flex items-center justify-center group" :class="{ 'cx-exit': startExit }">
           
           <!-- Outer Cinematic Rings -->
-          <div class="absolute inset-0 border-[1px] border-indigo-500/10 rounded-full"></div>
-          <div class="absolute inset-[-15px] border-[1px] border-indigo-500/5 rounded-full animate-ping-slow"></div>
+          <div class="absolute inset-0 border-[1px] border-indigo-500/20 rounded-full"></div>
+          <div class="absolute inset-[-20px] border-[1px] border-indigo-500/10 rounded-full animate-ping-slow"></div>
+          <div class="absolute inset-[-40px] border-[1px] border-indigo-500/5 rounded-full animate-pulse-slow"></div>
           
           <!-- Animated Progress Mask Path -->
-          <svg class="absolute inset-0 w-full h-full rotate-[-90deg]">
+          <svg class="absolute inset-0 w-full h-full rotate-[-90deg] drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]">
             <circle 
-              cx="96" cy="96" r="94" 
+              cx="128" cy="128" r="124" 
               fill="none" 
               stroke="url(#preloaderGrad)" 
-              stroke-width="3" 
-              stroke-dasharray="590"
-              stroke-dashoffset="590"
+              stroke-width="4" 
+              stroke-dasharray="780"
+              stroke-dashoffset="780"
               class="animate-draw-sync"
             />
             <defs>
@@ -48,18 +49,18 @@ onMounted(() => {
           </svg>
 
           <!-- Logo Badge Reveal -->
-          <div class="logo-box-reveal shadow-2xl shadow-indigo-600/20">
-             <img src="/Logo-Global-Nexora.png" alt="Nexora" class="w-24 h-24 object-contain" />
+          <div class="logo-box-reveal shadow-[0_0_50px_rgba(99,102,241,0.3)]">
+             <img src="/Logo-Global-Nexora.png" alt="Nexora" class="w-32 h-32 object-contain" />
           </div>
           
           <!-- Cinematic Shimmer -->
-          <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent rotate-45 animate-shimmer-fast"></div>
+          <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent rotate-45 animate-shimmer-fast"></div>
         </div>
 
         <!-- Professional Text Reveal -->
         <div class="mt-14 space-y-4">
           <div class="overflow-hidden">
-            <h2 class="text-3xl font-black tracking-[0.5em] text-white uppercase text-reveal-up">
+            <h2 class="text-4xl font-black tracking-[0.6em] text-white uppercase text-reveal-up" style="font-family: 'Montserrat', sans-serif;">
               NEXORA
             </h2>
           </div>
@@ -109,11 +110,11 @@ onMounted(() => {
 /* Logo Reveal */
 .logo-box-reveal {
   background: white;
-  padding: 12px;
-  border-radius: 20px;
-  animation: popIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  padding: 16px;
+  border-radius: 32px;
+  animation: popIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   opacity: 0;
-  transform: scale(0.4) translateY(30px);
+  transform: scale(0.4) translateY(40px);
 }
 
 @keyframes popIn {

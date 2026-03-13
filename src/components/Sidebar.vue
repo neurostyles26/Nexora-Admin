@@ -78,12 +78,12 @@ const handleLogout = async () => {
            ]"
          >
             <div v-if="!layoutStore.isSidebarCollapsed" class="flex items-center justify-between w-full px-3">
-               <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg border border-white/10 group-hover:rotate-3 transition-all duration-500 shrink-0">
-                     <Sparkles class="w-5 h-5 text-white" />
-                  </div>
-                  <span class="text-xl font-black italic tracking-tighter uppercase truncate sidebar-logo-text">Nexora</span>
-               </div>
+                <div class="flex items-center gap-3">
+                   <div class="logo-badge !w-10 !h-10 !rounded-xl group-hover:rotate-3 transition-all duration-500 shrink-0 border border-white/10">
+                      <img src="/Logo-Global-Nexora.png" alt="Nexora" class="w-full h-full object-contain p-1" />
+                   </div>
+                   <span class="text-2xl font-black italic tracking-tighter uppercase truncate sidebar-logo-text" style="font-family: 'Montserrat', sans-serif;">Nexora</span>
+                </div>
                
                <!-- Toggle -->
                <button 
@@ -95,10 +95,10 @@ const handleLogout = async () => {
                   <PanelLeftClose class="w-4 h-4" />
                </button>
             </div>
-            <div v-else class="flex flex-col items-center gap-4">
-               <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg border border-white/10 group-hover:scale-105 transition-all shrink-0">
-                  <span class="text-white font-black text-lg italic tracking-tighter">N</span>
-               </div>
+             <div v-else class="flex flex-col items-center gap-4">
+                <div class="logo-badge !w-11 !h-11 !rounded-xl group-hover:scale-110 transition-all shrink-0 border border-white/10">
+                   <img src="/Logo-Global-Nexora.png" alt="Nexora" class="w-full h-full object-contain p-1" />
+                </div>
                <button 
                  @click.stop="layoutStore.toggleSidebar"
                  class="hidden lg:flex p-1.5 rounded-lg transition-all active:scale-90 hover:bg-[var(--border-primary)]"

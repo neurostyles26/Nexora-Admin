@@ -56,7 +56,7 @@ const handleLogin = async () => {
         </div>
         
         <div class="text-center mb-8">
-          <h2 class="text-2xl font-black tracking-tight italic uppercase" style="color: var(--text-primary);">
+          <h2 class="text-2xl font-black tracking-tight italic uppercase" style="color: var(--text-primary); font-family: 'Montserrat', sans-serif;">
             {{ loginRole === 'admin' ? 'Nexora Central' : 'Acceso Seguro' }}
           </h2>
           <p class="text-sm mt-2 font-medium italic" style="color: var(--text-secondary);">
