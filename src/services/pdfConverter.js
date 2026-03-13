@@ -19,7 +19,7 @@ import { saveAs } from 'file-saver';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://localhost:8000';
 
 /**
  * Extracts structured content from a PDF (paragraphs and tables).

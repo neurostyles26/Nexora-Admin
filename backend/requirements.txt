@@ -3,6 +3,7 @@ uvicorn
 python-multipart
 docling
 camelot-py[cv]
+opencv-python-headless
 paddleocr
 paddlepaddle
 python-docx

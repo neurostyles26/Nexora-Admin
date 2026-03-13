@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nexora-pdf-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PADDLEOCR_VERSION
+        value: "2.7"
