@@ -15,8 +15,12 @@ import {
   History,
   Database,
   FileSpreadsheet,
-  PanelLeftClose
+  PanelLeftClose,
+  HelpCircle,
+  Info,
+  Lightbulb
 } from 'lucide-vue-next'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLayoutStore } from '../stores/layout'
@@ -24,6 +28,19 @@ import { useLayoutStore } from '../stores/layout'
 const router = useRouter()
 const authStore = useAuthStore()
 const layoutStore = useLayoutStore()
+
+const showGuide = ref(false)
+const activeTip = ref(0)
+
+const guideTips = [
+  { title: 'Inteligencia', text: 'Aquí encuentras el motor de análisis central con métricas en tiempo real.' },
+  { title: 'Comunidad', text: 'Gestiona tus clientes y sus perfiles vitales desde este módulo.' },
+  { title: 'Convertidor PDF', text: 'Usa nuestra IA avanzada para transformar documentos escaneados a Word o Excel.' }
+]
+
+if (authStore.user?.is_system_admin) {
+  guideTips.unshift({ title: 'Núcleo Fundador', text: 'Control maestro de seguridad y gestión global de la plataforma.' })
+}
 
 const menuItems = [
   { name: 'Inteligencia', icon: LayoutDashboard, path: '/dashboard' },
@@ -197,6 +214,54 @@ const handleLogout = async () => {
         </div>
         <ChevronRight v-if="!layoutStore.isSidebarCollapsed" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-30 transition-all -translate-x-1 group-hover:translate-x-0" />
       </router-link>
+
+      <!-- Nexora Guide (Only when expanded) -->
+      <div v-if="!layoutStore.isSidebarCollapsed" class="mt-8 px-2">
+        <div 
+          @click="showGuide = !showGuide"
+          class="glass-panel p-4 rounded-2xl border border-indigo-500/10 hover:border-indigo-500/30 transition-all cursor-pointer group relative overflow-hidden"
+          :class="{ 'bg-indigo-500/[0.05]': showGuide }"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                <HelpCircle class="w-3.5 h-3.5 text-indigo-400" />
+              </div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Guía Nexora</span>
+            </div>
+            <div v-if="!showGuide" class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
+          </div>
+          
+          <p v-if="!showGuide" class="text-[9px] text-slate-500 font-bold uppercase tracking-wider leading-relaxed pr-4">
+            ¿Necesitas ayuda con el panel? Haz clic aquí para explorar.
+          </p>
+
+          <div v-else class="space-y-4 animate-slide-up">
+            <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+              <div class="flex items-center gap-2">
+                <Lightbulb class="w-3 h-3 text-amber-400" />
+                <span class="text-[9px] font-black uppercase text-white">{{ guideTips[activeTip].title }}</span>
+              </div>
+              <p class="text-[9px] text-slate-400 leading-relaxed uppercase font-medium">{{ guideTips[activeTip].text }}</p>
+            </div>
+            
+            <div class="flex items-center justify-between gap-2">
+              <button 
+                @click.stop="activeTip = (activeTip + 1) % guideTips.length"
+                class="text-[8px] font-black uppercase text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Siguiente Tip →
+              </button>
+              <button 
+                @click.stop="showGuide = false"
+                class="text-[8px] font-black uppercase text-slate-600 hover:text-rose-400 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <!-- Bottom Actions -->
